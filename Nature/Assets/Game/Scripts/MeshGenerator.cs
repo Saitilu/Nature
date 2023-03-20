@@ -32,8 +32,10 @@ public class MeshGenerator : MonoBehaviour
         newCirclesIndexs = new int[sliceVerts];
         prevCircle = new int[sliceVerts];
 
-        initializeCircle();
-        for (int i = 0; i < circle.Length; i++)//each (Vector3 vertex in circle)
+
+        
+        InitializeCircle();
+        for (int i = 0; i < circle.Length; i++)
         {
             Vector3 point = player.localRotation * circle[i];//vertex;
             point += player.localPosition;
@@ -42,6 +44,8 @@ public class MeshGenerator : MonoBehaviour
 
             vertices.Add(point);
         }
+
+
     }
 
     public void AddToMesh()
@@ -75,10 +79,10 @@ public class MeshGenerator : MonoBehaviour
         UpdateMesh();
     }
 
-    void initializeCircle()
+    public void InitializeCircle()
     {
         circle = new Vector3[sliceVerts];
-        Vector3 point = new Vector3(radius, 0, 0);
+        Vector3 point = new Vector3(radius * player.lossyScale.x, 0, 0);
         Quaternion rot = Quaternion.Euler(0, 0, 360 / sliceVerts);
         for (int i = 0; i < sliceVerts; i++)
         {

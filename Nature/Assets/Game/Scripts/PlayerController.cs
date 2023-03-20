@@ -7,7 +7,8 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
-    [SerializeField] float nimbleness;
+    public float efficiency;
+    public float nimbleness;
     private float timer = 0;
     [SerializeField] MeshGenerator stemScript;
     Rigidbody rigidbody;
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
     Vector2 turn;
 
     [SerializeField] KevinCastejon.ConeMesh.Cone coneScript;
+    [SerializeField] Transform player;
 
     //multiplayer
     PhotonView view;
@@ -26,8 +28,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //lock cursor
-        Cursor.lockState = CursorLockMode.Locked;
+
         if (!coneScript.IsConeGenerated)
         {
             coneScript.GenerateCone();
@@ -52,7 +53,6 @@ public class PlayerController : MonoBehaviour
             camTurn = Input.GetAxis("Mouse X") * sensitivity;
             cameraRotater.localRotation *= Quaternion.Euler(0, 0, -camTurn); //turn camera
 
-
             //turn Player
             turn.x = Input.GetAxis("Horizontal") * nimbleness;
             turn.y = -Input.GetAxis("Vertical") * nimbleness;
@@ -64,12 +64,20 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (view.IsMine && SceneManager.GetActiveScene().name == "Game")
-            MoveCharacter();
-        timer += Time.deltaTime;
-        if (timer > .1)
         {
-            timer %= .1f;
-            stemScript.AddToMesh();
+            MoveCharacter();
+            speed -= .25f * Time.fixedDeltaTime / efficiency;
+            if (speed < 0)
+                speed = 0;
+        }
+        if (SceneManager.GetActiveScene().name == "Game")
+        {
+            timer += Time.fixedDeltaTime;
+            if (timer > .1)
+            {
+                timer %= .1f;
+                stemScript.AddToMesh();
+            }
         }
     }
 
@@ -79,5 +87,16 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = Vector3.Normalize(transform.forward);
         //move in direction
         rigidbody.MovePosition(transform.position + direction * speed * Time.deltaTime);
+    }
+
+    public void Boost()
+    {
+        speed += 1;
+    }
+
+    public void SetScale(float size)
+    {
+        player.localScale = new Vector3(size, size, size);
+        stemScript.InitializeCircle();
     }
 }
