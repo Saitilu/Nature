@@ -33,7 +33,7 @@ public class MeshGenerator : MonoBehaviour
         prevCircle = new int[sliceVerts];
 
 
-        
+
         InitializeCircle();
         for (int i = 0; i < circle.Length; i++)
         {
@@ -44,8 +44,6 @@ public class MeshGenerator : MonoBehaviour
 
             vertices.Add(point);
         }
-
-
     }
 
     public void AddToMesh()

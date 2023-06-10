@@ -6,6 +6,11 @@ using Photon.Pun;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Cam Settings")]
+    [SerializeField] float blend;
+    
+
+    [Header("Stats")]
     public float speed;
     public float efficiency;
     public float nimbleness;
@@ -15,7 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform cameraRotater;
     [SerializeField] float sensitivity;
 
-    float camTurn;
+    [SerializeField] float camTurn = 0f;
     Vector2 turn;
 
     [SerializeField] KevinCastejon.ConeMesh.Cone coneScript;
@@ -24,6 +29,8 @@ public class PlayerController : MonoBehaviour
     //multiplayer
     PhotonView view;
     [SerializeField] Camera cam;
+
+    [SerializeField] int rawCamTurn;
 
     // Start is called before the first frame update
     void Start()
@@ -50,13 +57,20 @@ public class PlayerController : MonoBehaviour
         if (view.IsMine && SceneManager.GetActiveScene().name == "Game")
         {
             //turn Camera
-            camTurn = Input.GetAxis("Mouse X") * sensitivity;
-            cameraRotater.localRotation *= Quaternion.Euler(0, 0, -camTurn); //turn camera
+            //camTurn = Input.GetAxis("Mouse X") * sensitivity;
+            //cameraRotater.localRotation *= Quaternion.Euler(0, 0, -camTurn); //turn camera
+            //camTurn = Input.GetAxis("Mouse Y") * sensitivity;
+            //cam.transform.localRotation *= Quaternion.Euler(-camTurn, 0, 0);
+            rawCamTurn = (Input.GetKey(KeyCode.E) ? 1 : 0) - (Input.GetKey(KeyCode.Q) ? 1 : 0);
+            camTurn += (rawCamTurn - camTurn) * blend;
+            //camTurn *= sensitivity;
+            cameraRotater.localRotation *= Quaternion.Euler(0, 0, sensitivity*-camTurn*Time.deltaTime);
 
             //turn Player
-            turn.x = Input.GetAxis("Horizontal") * nimbleness;
+
+            turn.x = Input.GetAxis("Horizontal") * nimbleness/4;
             turn.y = -Input.GetAxis("Vertical") * nimbleness;
-            Quaternion newRotation = cameraRotater.rotation * Quaternion.Euler(turn.y, turn.x, 0);
+            Quaternion newRotation = transform.rotation * cameraRotater.localRotation * Quaternion.Euler(turn.y, turn.x, 0);
             newRotation *= Quaternion.Euler(0, 0, -cameraRotater.localRotation.eulerAngles.z);
             rigidbody.MoveRotation(newRotation);
         }
